@@ -66,7 +66,6 @@ class _TapeState extends State<Tape> with SingleTickerProviderStateMixin {
   void _setupAudioListeners() {
     // Listen for duration changes
     _durationSubscription = _audioPlayer.onDurationChanged.listen((Duration duration) {
-      debugPrint('Duration changed: ${duration.inSeconds} seconds');
       setState(() {
         _totalDuration = duration;
       });
@@ -84,13 +83,11 @@ class _TapeState extends State<Tape> with SingleTickerProviderStateMixin {
     
     // Listen for completion
     _completionSubscription = _audioPlayer.onPlayerComplete.listen((event) {
-      debugPrint('Track completed');
       _handleTrackCompletion();
     });
     
     // Listen for state changes
     _stateSubscription = _audioPlayer.onPlayerStateChanged.listen((PlayerState state) {
-      debugPrint('Player state changed: $state');
       if (state == PlayerState.playing) {
         setState(() {
           _status = TapeStatus.playing;
@@ -215,17 +212,14 @@ class _TapeState extends State<Tape> with SingleTickerProviderStateMixin {
   }
 
   void stop() async {
-    debugPrint('Stop pressed');
     await _audioPlayer.stop();
   }
 
   void pause() async {
-    debugPrint('Pause pressed');
     await _audioPlayer.pause();
   }
 
   void play() async {
-    debugPrint('Play pressed');
     if (_url == null && _playlist.isNotEmpty) {
       // If no URL but we have playlist, load first track
       _loadTrack(0);
@@ -247,20 +241,16 @@ class _TapeState extends State<Tape> with SingleTickerProviderStateMixin {
   }
   
   void _testSound() async {
-    debugPrint('Testing sound with simple beep');
     try {
       // Play a system sound to test if audio works at all
       await _audioPlayer.play(AssetSource('audio/pl-PL-Chirp3-HD-Achernar.wav'), volume: 1.0);
-      debugPrint('Test sound played');
     } catch (e) {
-      debugPrint('Test sound error: $e');
+      // Handle error silently
     }
   }
 
   void _loadTrack(int index) async {
     if (index < 0 || index >= _playlist.length) return;
-    
-    debugPrint('Loading track index: $index');
     
     setState(() {
       _isLoading = true;
@@ -279,8 +269,6 @@ class _TapeState extends State<Tape> with SingleTickerProviderStateMixin {
     
     try {
       // AssetSource automatically prepends "assets/" so we just need "audio/filename"
-      debugPrint('Attempting to play: audio/$filename');
-      
       // Set source first
       await _audioPlayer.setSource(AssetSource('audio/$filename'));
       
@@ -290,23 +278,15 @@ class _TapeState extends State<Tape> with SingleTickerProviderStateMixin {
       setState(() {
         _isLoading = false;
       });
-      
-      debugPrint('Audio should be playing now');
     } catch (e) {
       setState(() {
         _isLoading = false;
       });
-      debugPrint('Error details: $e');
-      debugPrint('Error type: ${e.runtimeType}');
-      
       // Try without audio/ prefix
       try {
-        debugPrint('Trying without audio/ prefix: $filename');
         await _audioPlayer.setSource(AssetSource(filename));
         await _audioPlayer.resume();
-        debugPrint('Success with just filename!');
       } catch (e2) {
-        debugPrint('Also failed without prefix: $e2');
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('Error: ${e.toString()}')),
