@@ -7,7 +7,7 @@ A nostalgic Flutter app that recreates the classic cassette tape player experien
 ![Platform](https://img.shields.io/badge/Platform-iOS%20%7C%20Android-green.svg)
 
 <p align="center">
-  <img src="assets/screenshots/cassette_player_widget.png" alt="Retro Cassette Player Widget" width="350">
+  <img src="https://github.com/wawa2016/retroPlayer/blob/main/assets/screenshots/simulator_screenshot_3BEE34AC-1BF3-4871-8D61-5273322824A0.png" alt="Retro Cassette Player Widget" width="350">
 </p>
 
 ## 🎯 How to Use in Another App
