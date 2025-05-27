@@ -4,7 +4,7 @@ import 'cassette_player.dart';
 
 class Home extends StatelessWidget {
   const Home({super.key});
-  
+
   @override
   Widget build(BuildContext context) {
     // Create playlist from asset files
@@ -20,9 +20,9 @@ class Home extends StatelessWidget {
         source: AssetSource('audio/pl-PL-Chirp3-HD-Enceladus.wav'),
       ),
     ];
-    
+
     return Scaffold(
-      backgroundColor: const Color(0xfff9bf44),
+      backgroundColor: const Color.fromARGB(255, 225, 229, 234),
       body: Center(
         child: CassettePlayer(
           playlist: playlist,

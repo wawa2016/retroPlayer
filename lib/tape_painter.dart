@@ -49,22 +49,16 @@ class TapePainter extends CustomPainter {
     // Ensure minimum radius for visual feedback
     double leftRadius = holeRadius * (1 - progress) * 4 + holeRadius;
     double rightRadius = holeRadius * progress * 4 + holeRadius;
-    
-    Path leftTapeRoll = Path()
-      ..addOval(
-        Rect.fromCircle(
-          center: leftHolePosition,
-          radius: leftRadius,
-        ),
-      );
 
-    Path rightTapeRoll = Path()
-      ..addOval(
-        Rect.fromCircle(
-          center: rightHolePosition,
-          radius: rightRadius,
-        ),
-      );
+    Path leftTapeRoll =
+        Path()..addOval(
+          Rect.fromCircle(center: leftHolePosition, radius: leftRadius),
+        );
+
+    Path rightTapeRoll =
+        Path()..addOval(
+          Rect.fromCircle(center: rightHolePosition, radius: rightRadius),
+        );
 
     leftTapeRoll = Path.combine(
       PathOperation.difference,
@@ -95,12 +89,7 @@ class TapePainter extends CustomPainter {
   void _drawTapePin(Offset center, double angle) {
     _drawRotated(Offset(center.dx, center.dy), -angle, () {
       canvas.drawRect(
-        Rect.fromLTWH(
-          center.dx - 2,
-          center.dy - holeRadius,
-          4,
-          holeRadius / 4,
-        ),
+        Rect.fromLTWH(center.dx - 2, center.dy - holeRadius, 4, holeRadius / 4),
         paintObject,
       );
     });
@@ -121,16 +110,14 @@ class TapePainter extends CustomPainter {
       text: title,
     );
     TextPainter textPainter = TextPainter(
-        text: span,
-        textDirection: TextDirection.ltr,
-        textAlign: TextAlign.center);
+      text: span,
+      textDirection: TextDirection.ltr,
+      textAlign: TextAlign.center,
+    );
 
     double labelPadding = size.width * 0.05;
 
-    textPainter.layout(
-      minWidth: 0,
-      maxWidth: size.width - labelPadding * 2,
-    );
+    textPainter.layout(minWidth: 0, maxWidth: size.width - labelPadding * 2);
 
     final offset = Offset(
       (size.width - textPainter.width) * 0.5,
@@ -141,26 +128,26 @@ class TapePainter extends CustomPainter {
   }
 
   void _drawHoleRings() {
-    Path leftHoleRing = Path()
-      ..addOval(
-        Rect.fromCircle(
-          center: leftHolePosition,
-          radius: holeRadius * 1.1,
-        ),
-      );
+    Path leftHoleRing =
+        Path()..addOval(
+          Rect.fromCircle(center: leftHolePosition, radius: holeRadius * 1.1),
+        );
 
-    Path rightHoleRing = Path()
-      ..addOval(
-        Rect.fromCircle(
-          center: rightHolePosition,
-          radius: holeRadius * 1.1,
-        ),
-      );
+    Path rightHoleRing =
+        Path()..addOval(
+          Rect.fromCircle(center: rightHolePosition, radius: holeRadius * 1.1),
+        );
 
-    leftHoleRing =
-        Path.combine(PathOperation.difference, leftHoleRing, leftHole);
-    rightHoleRing =
-        Path.combine(PathOperation.difference, rightHoleRing, rightHole);
+    leftHoleRing = Path.combine(
+      PathOperation.difference,
+      leftHoleRing,
+      leftHole,
+    );
+    rightHoleRing = Path.combine(
+      PathOperation.difference,
+      rightHoleRing,
+      rightHole,
+    );
 
     paintObject.color = Colors.white;
     canvas.drawPath(leftHoleRing, paintObject);
@@ -179,10 +166,7 @@ class TapePainter extends CustomPainter {
       size.width * 0.6,
       size.height * 0.3,
     );
-    Path blackRectPath = Path()
-      ..addRRect(
-        RRect.fromRectXY(blackRect, 4, 4),
-      );
+    Path blackRectPath = Path()..addRRect(RRect.fromRectXY(blackRect, 4, 4));
 
     blackRectPath = Path.combine(
       PathOperation.difference,
@@ -222,9 +206,9 @@ class TapePainter extends CustomPainter {
     labelTopPath = _cutHolesIntoPath(labelTopPath);
     labelTopPath = _cutCenterWindowIntoPath(labelTopPath);
 
-    paintObject.color = Color(0xffd3c5ae);
+    paintObject.color = Color.fromARGB(255, 252, 250, 254);
     canvas.drawPath(labelPath, paintObject);
-    paintObject.color = Colors.red;
+    paintObject.color = const Color.fromARGB(255, 25, 92, 215);
     canvas.drawPath(labelTopPath, paintObject);
   }
 
@@ -246,21 +230,15 @@ class TapePainter extends CustomPainter {
     leftHolePosition = Offset(size.width * 0.3, size.height * 0.46);
     rightHolePosition = Offset(size.width * 0.7, size.height * 0.46);
 
-    leftHole = Path()
-      ..addOval(
-        Rect.fromCircle(
-          center: leftHolePosition,
-          radius: holeRadius,
-        ),
-      );
+    leftHole =
+        Path()..addOval(
+          Rect.fromCircle(center: leftHolePosition, radius: holeRadius),
+        );
 
-    rightHole = Path()
-      ..addOval(
-        Rect.fromCircle(
-          center: rightHolePosition,
-          radius: holeRadius,
-        ),
-      );
+    rightHole =
+        Path()..addOval(
+          Rect.fromCircle(center: rightHolePosition, radius: holeRadius),
+        );
   }
 
   _drawTape() {
@@ -276,7 +254,7 @@ class TapePainter extends CustomPainter {
 
     canvas.drawShadow(tapePath, Colors.black, 3.0, false);
     paintObject.color = Colors.black;
-    paintObject.color = Color(0xff522f19).withValues(alpha: 0.8);
+    paintObject.color = Color.fromARGB(255, 89, 90, 91).withValues(alpha: 0.8);
     canvas.drawPath(tapePath, paintObject);
   }
 
@@ -290,7 +268,7 @@ class TapePainter extends CustomPainter {
   @override
   bool shouldRepaint(TapePainter oldDelegate) {
     return oldDelegate.rotationValue != rotationValue ||
-           oldDelegate.title != title ||
-           oldDelegate.progress != progress;
+        oldDelegate.title != title ||
+        oldDelegate.progress != progress;
   }
 }
