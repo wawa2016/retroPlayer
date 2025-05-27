@@ -7,11 +7,13 @@ class TapePainter extends CustomPainter {
     required this.rotationValue,
     required this.title,
     required this.progress,
+    this.timeDisplay,
   });
 
   double rotationValue;
   String title;
   double progress;
+  String? timeDisplay;
 
   late double holeRadius;
   late Offset leftHolePosition;
@@ -105,8 +107,13 @@ class TapePainter extends CustomPainter {
   }
 
   void _drawTextLabel() {
+    // Draw title
     TextSpan span = TextSpan(
-      style: TextStyle(color: Colors.black),
+      style: TextStyle(
+        color: Colors.black,
+        fontSize: 14,
+        fontWeight: FontWeight.bold,
+      ),
       text: title,
     );
     TextPainter textPainter = TextPainter(
@@ -125,6 +132,28 @@ class TapePainter extends CustomPainter {
     );
 
     textPainter.paint(canvas, offset);
+
+    // Draw time display if provided
+    if (timeDisplay != null) {
+      TextSpan timeSpan = TextSpan(
+        style: TextStyle(color: Colors.white, fontSize: 12),
+        text: timeDisplay,
+      );
+      TextPainter timePainter = TextPainter(
+        text: timeSpan,
+        textDirection: TextDirection.ltr,
+        textAlign: TextAlign.center,
+      );
+
+      timePainter.layout(minWidth: 0, maxWidth: size.width - labelPadding * 2);
+
+      final timeOffset = Offset(
+        (size.width - timePainter.width) * 0.5,
+        size.height * 0.62, // Position in white area below blue
+      );
+
+      timePainter.paint(canvas, timeOffset);
+    }
   }
 
   void _drawHoleRings() {
@@ -269,6 +298,7 @@ class TapePainter extends CustomPainter {
   bool shouldRepaint(TapePainter oldDelegate) {
     return oldDelegate.rotationValue != rotationValue ||
         oldDelegate.title != title ||
-        oldDelegate.progress != progress;
+        oldDelegate.progress != progress ||
+        oldDelegate.timeDisplay != timeDisplay;
   }
 }

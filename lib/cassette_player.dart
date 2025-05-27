@@ -291,27 +291,14 @@ class CassettePlayerState extends State<CassettePlayer>
                     rotationValue: _animationController.value,
                     title: _currentTrack?.displayTitle ?? '',
                     progress: _progress,
+                    timeDisplay: widget.config.showTimeDisplay && !_isLoading
+                        ? '${_formatDuration(_currentPosition)} / ${_formatDuration(_totalDuration ?? Duration.zero)}'
+                        : _isLoading ? 'Loading...' : null,
                   ),
                 );
               },
             ),
           ),
-
-          if (widget.config.showTimeDisplay) ...[
-            const SizedBox(height: 10),
-            Text(
-              _isLoading
-                  ? 'Loading...'
-                  : '${_formatDuration(_currentPosition)} / ${_formatDuration(_totalDuration ?? Duration.zero)}',
-              style:
-                  widget.config.timeTextStyle ??
-                  const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black87,
-                  ),
-            ),
-          ],
 
           if (widget.config.showControls) ...[
             const SizedBox(height: 20),

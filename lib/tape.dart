@@ -12,13 +12,13 @@ enum TapeStatus { initial, playing, pausing, stopping, choosing }
 class AudioFile {
   final String path;
   final String title;
-  
+
   AudioFile({required this.path, required this.title});
 }
 
 class Tape extends StatefulWidget {
   const Tape({super.key});
-  
+
   @override
   State<Tape> createState() => _TapeState();
 }
@@ -26,7 +26,7 @@ class Tape extends StatefulWidget {
 class _TapeState extends State<Tape> with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late AudioPlayer _audioPlayer;
-  
+
   // Audio state
   TapeStatus _status = TapeStatus.initial;
   String? _url;
@@ -36,13 +36,13 @@ class _TapeState extends State<Tape> with SingleTickerProviderStateMixin {
   Duration? _totalDuration;
   Duration _currentDuration = Duration.zero;
   bool _isLoading = false;
-  
+
   // Stream subscriptions
   StreamSubscription<Duration>? _durationSubscription;
   StreamSubscription<Duration>? _positionSubscription;
   StreamSubscription<void>? _completionSubscription;
   StreamSubscription<PlayerState>? _stateSubscription;
-  
+
   final List<AudioFile> _playlist = [
     AudioFile(path: 'pl-PL-Chirp3-HD-Achernar.wav', title: 'Achernar'),
     AudioFile(path: 'pl-PL-Chirp3-HD-Enceladus.wav', title: 'Enceladus'),
@@ -59,35 +59,42 @@ class _TapeState extends State<Tape> with SingleTickerProviderStateMixin {
 
     _audioPlayer = AudioPlayer();
     _audioPlayer.setReleaseMode(ReleaseMode.stop);
-    
+
     _setupAudioListeners();
   }
-  
+
   void _setupAudioListeners() {
     // Listen for duration changes
-    _durationSubscription = _audioPlayer.onDurationChanged.listen((Duration duration) {
+    _durationSubscription = _audioPlayer.onDurationChanged.listen((
+      Duration duration,
+    ) {
       setState(() {
         _totalDuration = duration;
       });
     });
-    
+
     // Listen for position changes
-    _positionSubscription = _audioPlayer.onPositionChanged.listen((Duration position) {
+    _positionSubscription = _audioPlayer.onPositionChanged.listen((
+      Duration position,
+    ) {
       setState(() {
         _currentDuration = position;
         if (_totalDuration != null && _totalDuration!.inMilliseconds > 0) {
-          _currentPosition = position.inMilliseconds / _totalDuration!.inMilliseconds;
+          _currentPosition =
+              position.inMilliseconds / _totalDuration!.inMilliseconds;
         }
       });
     });
-    
+
     // Listen for completion
     _completionSubscription = _audioPlayer.onPlayerComplete.listen((event) {
       _handleTrackCompletion();
     });
-    
+
     // Listen for state changes
-    _stateSubscription = _audioPlayer.onPlayerStateChanged.listen((PlayerState state) {
+    _stateSubscription = _audioPlayer.onPlayerStateChanged.listen((
+      PlayerState state,
+    ) {
       if (state == PlayerState.playing) {
         setState(() {
           _status = TapeStatus.playing;
@@ -108,7 +115,7 @@ class _TapeState extends State<Tape> with SingleTickerProviderStateMixin {
       }
     });
   }
-  
+
   void _handleTrackCompletion() {
     if (_currentTrackIndex < _playlist.length - 1) {
       _loadTrack(_currentTrackIndex + 1);
@@ -150,20 +157,14 @@ class _TapeState extends State<Tape> with SingleTickerProviderStateMixin {
                   rotationValue: _controller.value,
                   title: _title ?? '',
                   progress: _currentPosition,
+                  timeDisplay:
+                      _isLoading
+                          ? 'Loading...'
+                          : '${_formatDuration(_currentDuration)} / ${_formatDuration(_totalDuration ?? Duration.zero)}',
                 ),
               );
             },
             animation: _controller,
-          ),
-        ),
-        SizedBox(height: 10),
-        // Time display
-        Text(
-          _isLoading ? 'Loading...' : '${_formatDuration(_currentDuration)} / ${_formatDuration(_totalDuration ?? Duration.zero)}',
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-            color: Colors.black87,
           ),
         ),
         SizedBox(height: 20),
@@ -227,23 +228,26 @@ class _TapeState extends State<Tape> with SingleTickerProviderStateMixin {
       await _audioPlayer.resume();
     }
   }
-  
+
   void previousTrack() {
     if (_currentTrackIndex > 0) {
       _loadTrack(_currentTrackIndex - 1);
     }
   }
-  
+
   void nextTrack() {
     if (_currentTrackIndex < _playlist.length - 1) {
       _loadTrack(_currentTrackIndex + 1);
     }
   }
-  
+
   void _testSound() async {
     try {
       // Play a system sound to test if audio works at all
-      await _audioPlayer.play(AssetSource('audio/pl-PL-Chirp3-HD-Achernar.wav'), volume: 1.0);
+      await _audioPlayer.play(
+        AssetSource('audio/pl-PL-Chirp3-HD-Achernar.wav'),
+        volume: 1.0,
+      );
     } catch (e) {
       // Handle error silently
     }
@@ -251,7 +255,7 @@ class _TapeState extends State<Tape> with SingleTickerProviderStateMixin {
 
   void _loadTrack(int index) async {
     if (index < 0 || index >= _playlist.length) return;
-    
+
     setState(() {
       _isLoading = true;
       _currentTrackIndex = index;
@@ -260,21 +264,21 @@ class _TapeState extends State<Tape> with SingleTickerProviderStateMixin {
       _currentDuration = Duration.zero;
       _totalDuration = null;
     });
-    
+
     // Stop any current playback
     await _audioPlayer.stop();
-    
+
     final filename = _playlist[index].path;
     _url = 'audio/$filename';
-    
+
     try {
       // AssetSource automatically prepends "assets/" so we just need "audio/filename"
       // Set source first
       await _audioPlayer.setSource(AssetSource('audio/$filename'));
-      
+
       // Then resume
       await _audioPlayer.resume();
-      
+
       setState(() {
         _isLoading = false;
       });
@@ -288,14 +292,14 @@ class _TapeState extends State<Tape> with SingleTickerProviderStateMixin {
         await _audioPlayer.resume();
       } catch (e2) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Error: ${e.toString()}')),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text('Error: ${e.toString()}')));
         }
       }
     }
   }
-  
+
   Future<void> choose() async {
     stop();
 
@@ -317,7 +321,7 @@ class _TapeState extends State<Tape> with SingleTickerProviderStateMixin {
     PlatformFile file = result.files.first;
 
     _url = file.path;
-    
+
     // Get title from filename
     String title = file.name;
     // Remove file extension from title
@@ -330,7 +334,7 @@ class _TapeState extends State<Tape> with SingleTickerProviderStateMixin {
       _currentPosition = 0.0;
       _currentDuration = Duration.zero;
     });
-    
+
     try {
       await _audioPlayer.play(DeviceFileSource(_url!));
     } catch (e) {
